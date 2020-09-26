@@ -1,5 +1,7 @@
 module.exports = {
   CONNECT: "connection",
   DISCONNECT: "disconnect",
-  WELCOME_MESSAGE: "welcome_message",
+  INIT_PLAYERS: "init_players",
+  GET_POSITION: "get_position",
+  BROADCAST_POSITIONS: "broadcast_positions",
 };
