@@ -23,6 +23,9 @@ public class NetworkManager : MonoBehaviour {
 
     private SocketManager _socketManager;
 
+    private ulong _updateRate = 50;
+    private ulong _nextUpdate;
+
     private void Start() {
         _socketManager = new SocketManager(new Uri(URI + ":" + PORT + "/socket.io/"));
 
@@ -34,9 +37,22 @@ public class NetworkManager : MonoBehaviour {
 
     private void Update() {
         if (_socketManager.Socket.IsOpen) {
-            float posX = transform.position.x;
-            _socketManager.Socket.Emit("get_position", posX);
+            Tick();
         }
+    }
+
+    private void Tick() {
+        var now = new Date();
+        if (now < _nextUpdate) {
+            return;
+        }
+
+        _nextUpdate = now + this._updateRate;
+        SendPosition();
+    }
+
+    private void SendPosition() {
+        _socketManager.Socket.Emit("MOVE", transform.position.x);
     }
 
     #region DEFAULT CONNECTIONS/DISCONNECTION
@@ -51,7 +67,7 @@ public class NetworkManager : MonoBehaviour {
         _socketManager.Socket.On("INIT_PLAYERS", OnInitPlayersReceived);
         _socketManager.Socket.On("PLAYER_CONNECTED", OnPlayerConnected);
         _socketManager.Socket.On("PLAYER_DISCONNECTED", OnPlayerDisconnected);
-        _socketManager.Socket.On("broadcast_positions", OnBroadcastPositionsReceived);
+        _socketManager.Socket.On("MOVE", OnBroadcastPositionsReceived);
     }
 
     private void OnWelcomeMessageReceived(Socket socket, Packet packet, object[] args) {
@@ -60,6 +76,11 @@ public class NetworkManager : MonoBehaviour {
 
     private void OnDisconnected(Socket socket, Packet packet, object[] args) {
         Debug.Log("OnDisconnect");
+
+        _socketManager.Socket.Off("INIT_PLAYERS");
+        _socketManager.Socket.Off("PLAYER_CONNECTED");
+        _socketManager.Socket.Off("PLAYER_DISCONNECTED");
+        _socketManager.Socket.Off("MOVE");
     }
 
     #endregion
@@ -79,7 +100,7 @@ public class NetworkManager : MonoBehaviour {
     }
 
     private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {
-        //Debug.Log("OnBroadcastPositionsReceived " + packet.Payload);
+        Debug.Log("OnBroadcastPositionsReceived " + packet.Payload);
     }
 
     #endregion

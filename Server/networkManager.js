@@ -25,12 +25,14 @@ module.exports = {
     io.on(events.CONNECT, (socket) => {
       handleNewConnection(socket);
       handleDisconnection(socket);
+      handleMovement(socket);
     });
 
     const handleNewConnection = (socket) => {
       const player = {
         id: uuidv4(),
         socket,
+        position: 0,
       };
 
       console.log(
@@ -69,12 +71,25 @@ module.exports = {
       });
     };
 
+    const handleMovement = (socket) => {
+      socket.on("MOVE", (data) => {
+        const player = getPlayerBySocketId(socket);
+
+        if (!player) {
+          console.log("Player not found: " + socket.id);
+          return;
+        }
+
+        player.position = data;
+      });
+    };
+
     // sends each client its current sequence number
     setInterval(() => {
       playerSockets.forEach((player) => {
-        player.socket.emit(events.BROADCAST_POSITIONS, {
+        player.socket.emit("MOVE", {
           id: player.id,
-          posX: 0,
+          posX: player.position,
         });
       });
     }, 1000 / TICK_RATE);
