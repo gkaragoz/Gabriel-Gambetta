@@ -39,6 +39,15 @@ module.exports = {
 
       playerSockets.push(player);
 
+      socket.emit("welcome_message", player.id);
+
+      if (playerSockets.length > 1) {
+        socket.emit(
+          "INIT_PLAYERS",
+          playerSockets.map((p) => p.id).filter((id) => id !== player.id)
+        );
+      }
+
       socket.broadcast.emit("PLAYER_CONNECTED", player.id);
 
       logOnlinePeopleCount();

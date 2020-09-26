@@ -30,9 +30,6 @@ public class NetworkManager : MonoBehaviour {
         _socketManager.Socket.On("connect", OnConnected);
         _socketManager.Socket.On("welcome_message", OnWelcomeMessageReceived);
         _socketManager.Socket.On("disconnect", OnDisconnected);
-
-        _socketManager.Socket.On("init_players", OnInitPlayersReceived);
-        _socketManager.Socket.On("broadcast_positions", OnBroadcastPositionsReceived);
     }
 
     private void Update() {
@@ -50,6 +47,11 @@ public class NetworkManager : MonoBehaviour {
 
     private void OnConnected(Socket socket, Packet packet, object[] args) {
         Debug.Log("OnConnect!");
+
+        _socketManager.Socket.On("INIT_PLAYERS", OnInitPlayersReceived);
+        _socketManager.Socket.On("PLAYER_CONNECTED", OnPlayerConnected);
+        _socketManager.Socket.On("PLAYER_DISCONNECTED", OnPlayerDisconnected);
+        _socketManager.Socket.On("broadcast_positions", OnBroadcastPositionsReceived);
     }
 
     private void OnWelcomeMessageReceived(Socket socket, Packet packet, object[] args) {
@@ -68,8 +70,16 @@ public class NetworkManager : MonoBehaviour {
         Debug.Log("OnInitPlayersReceived " + packet.Payload);
     }
 
+    private void OnPlayerConnected(Socket socket, Packet packet, object[] args) {
+        Debug.Log("OnPlayerConnected " + packet.Payload);
+    }
+
+    private void OnPlayerDisconnected(Socket socket, Packet packet, object[] args) {
+        Debug.Log("OnPlayerDisconnected" + packet.Payload);
+    }
+
     private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {
-        Debug.Log("OnBroadcastPositionsReceived " + packet.Payload);
+        //Debug.Log("OnBroadcastPositionsReceived " + packet.Payload);
     }
 
     #endregion
