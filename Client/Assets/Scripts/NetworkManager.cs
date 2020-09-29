@@ -2,6 +2,7 @@
 using BestHTTP.SocketIO;
 using System;
 using MessagePack;
+using System.Collections.Generic;
 
 public class NetworkManager : MonoBehaviour {
 
@@ -28,7 +29,9 @@ public class NetworkManager : MonoBehaviour {
     private ulong _nextUpdate;
 
     private void Start() {
-        _socketManager = new SocketManager(new Uri(URI + ":" + PORT + "/socket.io/"));
+        SocketOptions options = new SocketOptions();
+        options.ConnectWith = BestHTTP.SocketIO.Transports.TransportTypes.WebSocket;
+        _socketManager = new SocketManager(new Uri(URI + ":" + PORT + "/socket.io/"), options);
 
         _socketManager.Socket.On("connecting", OnConnecting);
         _socketManager.Socket.On("connect", OnConnected);
@@ -136,7 +139,10 @@ public class NetworkManager : MonoBehaviour {
     }
 
     private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {
-        Debug.Log("OnBroadcastPositionsReceived " + packet.Payload);
+        MessagePackSerializer.DefaultOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options;
+
+        NetworkInputResponse receivedData = MessagePackSerializer.Deserialize<NetworkInputResponse>(packet.Attachments[0]);
+        Debug.Log("OnBroadcastPositionsReceived:\n" + "id: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
     }
 
     #endregion
