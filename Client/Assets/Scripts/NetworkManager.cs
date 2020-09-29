@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using BestHTTP.SocketIO;
 using System;
+using MessagePack;
 
 public class NetworkManager : MonoBehaviour {
 
@@ -48,11 +49,46 @@ public class NetworkManager : MonoBehaviour {
         }
 
         _nextUpdate = now + this._updateRate;
-        SendPosition();
+
+        if (Input.GetKey(KeyCode.UpArrow)) {
+            SendPosition(Direction.UP);
+        }
+        if (Input.GetKey(KeyCode.RightArrow)) {
+            SendPosition(Direction.RIGHT);
+        }
+        if (Input.GetKey(KeyCode.DownArrow)) {
+            SendPosition(Direction.DOWN);
+        }
+        if (Input.GetKey(KeyCode.LeftArrow)) {
+            SendPosition(Direction.LEFT);
+        }
     }
 
-    private void SendPosition() {
-        _socketManager.Socket.Emit("MOVE", transform.position.x);
+    private void SendPosition(Direction direction) {
+        Vector3 inputVector = Vector3.zero;
+        switch (direction) {
+            case Direction.RIGHT:
+                inputVector = Vector3.right;
+                break;
+            case Direction.LEFT:
+                inputVector = Vector3.left;
+                break;
+            case Direction.UP:
+                inputVector = Vector3.up;
+                break;
+            case Direction.DOWN:
+                inputVector = Vector3.down;
+                break;
+        }
+
+        NetworkInput networkInput = new NetworkInput() {
+            Input = inputVector
+        };
+
+        Debug.Log("[MOVE] Send data: " + inputVector);
+
+        byte[] bytes = MessagePackSerializer.Serialize(networkInput);
+        _socketManager.Socket.Emit("MOVE", bytes);
     }
 
     #region DEFAULT CONNECTIONS/DISCONNECTION
