@@ -145,9 +145,13 @@ public class NetworkManager : MonoBehaviour {
     }
 
     private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {
-        Debug.Log(MessagePackSerializer.ConvertToJson(packet.Attachments[0]));
-        //NetworkInputResponse receivedData = MessagePackSerializer.Deserialize<NetworkInputResponse>(packet.Attachments[0]);
-        //Debug.Log("OnBroadcastPositionsReceived:\n" + "id: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
+        //Debug.Log(MessagePackSerializer.ConvertToJson(packet.Attachments[0]));
+
+        NetworkInputResponse[] receivedDatas = MessagePackSerializer.Deserialize<NetworkInputResponse[]>(packet.Attachments[0]);
+        Debug.Log("OnBroadcastPositionsReceived:");
+        foreach (var receivedData in receivedDatas) {
+            Debug.Log("id: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
+        }
     }
 
     #endregion
