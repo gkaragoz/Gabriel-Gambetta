@@ -15,8 +15,6 @@ class Player {
   handleMovement = () => {
     this.socket.on("MOVE", (data) => {
       const decodedData = decode(data);
-      console.log(this.id);
-      console.log(decodedData);
       const { additionX, additionY } = this.analyzeInput(decodedData);
 
       this.position.x += additionX;

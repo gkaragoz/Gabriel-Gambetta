@@ -33,7 +33,7 @@ module.exports = {
     });
 
     const handleNewConnection = (socket) => {
-      const player = new Player(uuidv4(), socket, { x: 0, y: 0 }, 0.2);
+      const player = new Player(uuidv4(), socket, { x: 0, y: 0 }, 0.05);
 
       console.log(
         `New player connected: ${socket.handshake.address} [${player.id}]`

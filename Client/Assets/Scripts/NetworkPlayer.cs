@@ -38,7 +38,7 @@ public class NetworkPlayer : MonoBehaviour {
         NetworkInputResponse[] receivedDatas = MessagePackSerializer.Deserialize<NetworkInputResponse[]>(packet.Attachments[0]);
 
         foreach (var receivedData in receivedDatas) {
-            Debug.Log("OnBroadcastPositionsReceived: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
+            //Debug.Log("OnBroadcastPositionsReceived: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
             RoomManager.instance.GetPlayerBySocketId(receivedData.id).Move(receivedData);
         }
     }
