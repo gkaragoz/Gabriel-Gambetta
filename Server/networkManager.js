@@ -73,15 +73,19 @@ module.exports = {
 
     // sends each client its current sequence number
     setInterval(() => {
+      let data = [];
+
       players.forEach((player) => {
-        const data = {
+        const playerData = {
           id: player.id,
           posX: player.position.x,
           posY: player.position.y,
         };
 
-        player.socket.binary(true).emit("MOVE", encode(data));
+        data.push(playerData);
       });
+
+      io.binary(true).emit("MOVE", encode(data));
     }, 1000 / TICK_RATE);
   },
 };

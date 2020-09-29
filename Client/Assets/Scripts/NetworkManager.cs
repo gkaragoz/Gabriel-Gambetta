@@ -2,11 +2,12 @@
 using BestHTTP.SocketIO;
 using System;
 using MessagePack;
-using System.Collections.Generic;
 
 public class NetworkManager : MonoBehaviour {
 
     public static NetworkManager instance;
+    public static Action<string> onConnected;
+    public static Action onDisconnected;
 
     private void Awake() {
         if (instance == null) {
@@ -91,8 +92,6 @@ public class NetworkManager : MonoBehaviour {
             inputY = inputVector.y
         };
 
-        Debug.Log("[MOVE] Send data: " + inputVector);
-
         byte[] bytes = MessagePackSerializer.Serialize(networkInput);
         _socketManager.Socket.Emit("MOVE", bytes);
     }
@@ -114,6 +113,8 @@ public class NetworkManager : MonoBehaviour {
 
     private void OnWelcomeMessageReceived(Socket socket, Packet packet, object[] args) {
         Debug.Log("Receive OnWelcomeMessage " + packet.Payload);
+
+        onConnected?.Invoke(packet.Payload);
     }
 
     private void OnDisconnected(Socket socket, Packet packet, object[] args) {
@@ -123,6 +124,8 @@ public class NetworkManager : MonoBehaviour {
         _socketManager.Socket.Off("PLAYER_CONNECTED");
         _socketManager.Socket.Off("PLAYER_DISCONNECTED");
         _socketManager.Socket.Off("MOVE");
+
+        onDisconnected?.Invoke();
     }
 
     #endregion
