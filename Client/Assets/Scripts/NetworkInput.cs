@@ -1,10 +1,6 @@
-﻿using MessagePack;
-using UnityEngine;
-
-[MessagePackObject]
-public class NetworkInput {
-    [Key(0)]
-    public Vector3 Input { get; set; }
+﻿public class NetworkInput {
+    public float inputX { get; set; }
+    public float inputY { get; set; }
 }
 
 public class NetworkInputResponse {

@@ -13,8 +13,9 @@ class Player {
 
   handleMovement = () => {
     this.socket.on("MOVE", (data) => {
-      console.log(decode(data));
-      this.position = data;
+      const decodedData = decode(data);
+      console.log(decodedData);
+      this.position = { x: decodedData.inputX, y: decodedData.inputY };
     });
   };
 }

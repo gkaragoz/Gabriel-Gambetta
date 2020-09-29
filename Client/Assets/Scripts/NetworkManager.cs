@@ -29,6 +29,8 @@ public class NetworkManager : MonoBehaviour {
     private ulong _nextUpdate;
 
     private void Start() {
+        MessagePackSerializer.DefaultOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options;
+
         SocketOptions options = new SocketOptions();
         options.ConnectWith = BestHTTP.SocketIO.Transports.TransportTypes.WebSocket;
         _socketManager = new SocketManager(new Uri(URI + ":" + PORT + "/socket.io/"), options);
@@ -85,7 +87,8 @@ public class NetworkManager : MonoBehaviour {
         }
 
         NetworkInput networkInput = new NetworkInput() {
-            Input = inputVector
+            inputX = inputVector.x,
+            inputY = inputVector.y
         };
 
         Debug.Log("[MOVE] Send data: " + inputVector);
@@ -139,10 +142,9 @@ public class NetworkManager : MonoBehaviour {
     }
 
     private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {
-        MessagePackSerializer.DefaultOptions = MessagePack.Resolvers.ContractlessStandardResolver.Options;
-
-        NetworkInputResponse receivedData = MessagePackSerializer.Deserialize<NetworkInputResponse>(packet.Attachments[0]);
-        Debug.Log("OnBroadcastPositionsReceived:\n" + "id: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
+        Debug.Log(MessagePackSerializer.ConvertToJson(packet.Attachments[0]));
+        //NetworkInputResponse receivedData = MessagePackSerializer.Deserialize<NetworkInputResponse>(packet.Attachments[0]);
+        //Debug.Log("OnBroadcastPositionsReceived:\n" + "id: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
     }
 
     #endregion
