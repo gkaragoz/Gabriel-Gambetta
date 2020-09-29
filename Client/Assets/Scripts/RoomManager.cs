@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class RoomManager : MonoBehaviour {
 
+    public static RoomManager instance;
+
     [SerializeField]
     private NetworkPlayer _networkPlayerPrefab = null;
 
@@ -12,6 +14,14 @@ public class RoomManager : MonoBehaviour {
     private List<NetworkPlayer> _networkPlayers = new List<NetworkPlayer>();
 
     private void Awake() {
+        if (instance == null) {
+            instance = this;
+        } else if (instance != this) {
+            Destroy(gameObject);
+        }
+
+        DontDestroyOnLoad(instance);
+
         NetworkManager.onConnected += OnConnected;
         NetworkManager.onDisconnected += OnDisconnected;
         NetworkManager.onInitPlayersReceived += OnInitPlayersReceived;
@@ -56,10 +66,6 @@ public class RoomManager : MonoBehaviour {
         DestroyPlayer(disconnectedPlayer);
     }
 
-    private NetworkPlayer GetPlayerBySocketId(string socketId) {
-        return _networkPlayers.Where(p => p.SocketId == socketId).SingleOrDefault();
-    }
-
     private NetworkPlayer SpawnPlayer(string socketId) {
         NetworkPlayer spawnedPlayer = Instantiate(_networkPlayerPrefab, Vector3.zero, Quaternion.identity);
         spawnedPlayer.SocketId = socketId;
@@ -77,6 +83,10 @@ public class RoomManager : MonoBehaviour {
     
     private NetworkPlayer GetMe() {
         return this._networkPlayers.Where(p => p.IsMe == true).SingleOrDefault();
+    }
+
+    public NetworkPlayer GetPlayerBySocketId(string socketId) {
+        return _networkPlayers.Where(p => p.SocketId == socketId).SingleOrDefault();
     }
 
 }

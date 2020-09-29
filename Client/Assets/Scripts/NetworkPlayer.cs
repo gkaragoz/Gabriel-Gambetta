@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using MessagePack;
+using BestHTTP.SocketIO;
 
 public class NetworkPlayer : MonoBehaviour {
 
@@ -7,11 +8,17 @@ public class NetworkPlayer : MonoBehaviour {
     private ulong _nextUpdate;
 
     private NetworkManager _networkManager = null;
-    public string SocketId { get; set; }
+    
+    public string SocketId {
+        get { return _socketId; }
+        set { _socketId = value; }
+    }
 
     [Header("Debug")]
     [SerializeField]
     private bool _isMe = false;
+    [SerializeField]
+    private string _socketId = string.Empty;
 
     public bool IsMe {
         get { return _isMe; }
@@ -21,8 +28,24 @@ public class NetworkPlayer : MonoBehaviour {
         }
     }
 
-    private void Start() {
+    private void Awake() {
         _networkManager = NetworkManager.instance;
+
+        _networkManager.SocketManager.Socket.On("MOVE", OnBroadcastPositionsReceived);
+    }
+
+    private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {
+        NetworkInputResponse[] receivedDatas = MessagePackSerializer.Deserialize<NetworkInputResponse[]>(packet.Attachments[0]);
+
+        foreach (var receivedData in receivedDatas) {
+            Debug.Log("OnBroadcastPositionsReceived: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
+            RoomManager.instance.GetPlayerBySocketId(receivedData.id).Move(receivedData);
+        }
+    }
+
+    private void Move(NetworkInputResponse data) {
+        Vector3 position = new Vector3(data.posX, data.posY, 0f);
+        transform.position = position;
     }
 
     private void Update() {
@@ -85,6 +108,10 @@ public class NetworkPlayer : MonoBehaviour {
         } else {
             GetComponent<SpriteRenderer>().color = Color.blue;
         }
+    }
+
+    private bool CheckIsMe(string id) {
+        return SocketId == id;
     }
 
 }

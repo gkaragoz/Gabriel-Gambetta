@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const events = require("./events");
 const Player = require("./player");
 
-const TICK_RATE = 2;
+const TICK_RATE = 20;
 
 let io;
 let players = [];

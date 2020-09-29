@@ -55,11 +55,11 @@ public class NetworkManager : MonoBehaviour {
         _socketManager.Socket.On("INIT_PLAYERS", OnInitPlayersReceived);
         _socketManager.Socket.On("PLAYER_CONNECTED", OnPlayerConnected);
         _socketManager.Socket.On("PLAYER_DISCONNECTED", OnPlayerDisconnected);
-        _socketManager.Socket.On("MOVE", OnBroadcastPositionsReceived);
     }
 
     private void OnWelcomeMessageReceived(Socket socket, Packet packet, object[] args) {
         NetworkWelcomeMessageResponse receivedData = MessagePackSerializer.Deserialize<NetworkWelcomeMessageResponse>(packet.Attachments[0]);
+        Debug.Log("OnWelcomeMessageReceived: " + receivedData.id);
 
         onConnected?.Invoke(receivedData.id);
     }
@@ -95,16 +95,6 @@ public class NetworkManager : MonoBehaviour {
         NetworkDisconnectedPlayerResponse receivedData = MessagePackSerializer.Deserialize<NetworkDisconnectedPlayerResponse>(packet.Attachments[0]);
 
         onPlayerDisconnected?.Invoke(receivedData.id);
-    }
-
-    private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {
-        //Debug.Log(MessagePackSerializer.ConvertToJson(packet.Attachments[0]));
-
-        NetworkInputResponse[] receivedDatas = MessagePackSerializer.Deserialize<NetworkInputResponse[]>(packet.Attachments[0]);
-        Debug.Log("OnBroadcastPositionsReceived:");
-        foreach (var receivedData in receivedDatas) {
-            Debug.Log("id: " + receivedData.id + " posX: " + receivedData.posX + " posY: " + receivedData.posY);
-        }
     }
 
     #endregion
