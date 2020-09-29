@@ -41,16 +41,23 @@ module.exports = {
 
       players.push(player);
 
-      socket.emit("welcome_message", player.id);
+      const welcomeMessageResponse = { id: player.id };
+      socket
+        .binary(true)
+        .emit("welcome_message", encode(welcomeMessageResponse));
 
       if (players.length > 1) {
-        socket.emit(
-          "INIT_PLAYERS",
-          players.map((p) => p.id).filter((id) => id !== player.id)
-        );
+        const onlinePlayersResponse = {
+          ids: players.map((p) => p.id).filter((id) => id !== player.id),
+        };
+
+        socket.binary(true).emit("INIT_PLAYERS", encode(onlinePlayersResponse));
       }
 
-      socket.broadcast.emit("PLAYER_CONNECTED", player.id);
+      const playerConnectedResponse = { id: player.id };
+      socket
+        .binary(true)
+        .broadcast.emit("PLAYER_CONNECTED", encode(playerConnectedResponse));
 
       logOnlinePeopleCount();
     };
@@ -62,7 +69,11 @@ module.exports = {
         if (disconnectedPlayer) {
           console.log("PLAYER DISCONNECTED: " + disconnectedPlayer.id);
 
-          io.emit("PLAYER_DISCONNECTED", disconnectedPlayer.id);
+          const disconnectedPlayerId = { id: disconnectedPlayer.id };
+          io.binary(true).emit(
+            "PLAYER_DISCONNECTED",
+            encode(disconnectedPlayerId)
+          );
 
           players = players.filter((p) => p.socket !== socket);
         }

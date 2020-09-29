@@ -8,6 +8,9 @@ public class NetworkManager : MonoBehaviour {
     public static NetworkManager instance;
     public static Action<string> onConnected;
     public static Action onDisconnected;
+    public static Action<string[]> onInitPlayersReceived;
+    public static Action<string> onPlayerConnected;
+    public static Action<string> onPlayerDisconnected;
 
     private void Awake() {
         if (instance == null) {
@@ -56,9 +59,9 @@ public class NetworkManager : MonoBehaviour {
     }
 
     private void OnWelcomeMessageReceived(Socket socket, Packet packet, object[] args) {
-        Debug.Log("Receive OnWelcomeMessage " + packet.Payload);
+        NetworkWelcomeMessageResponse receivedData = MessagePackSerializer.Deserialize<NetworkWelcomeMessageResponse>(packet.Attachments[0]);
 
-        onConnected?.Invoke(packet.Payload);
+        onConnected?.Invoke(receivedData.id);
     }
 
     private void OnDisconnected(Socket socket, Packet packet, object[] args) {
@@ -77,15 +80,21 @@ public class NetworkManager : MonoBehaviour {
     #region CUSTOM EVENTS
 
     private void OnInitPlayersReceived(Socket socket, Packet packet, object[] args) {
-        Debug.Log("OnInitPlayersReceived " + packet.Payload);
+        NetworkInitPlayersResponse receivedData = MessagePackSerializer.Deserialize<NetworkInitPlayersResponse>(packet.Attachments[0]);
+
+        onInitPlayersReceived?.Invoke(receivedData.ids);
     }
 
     private void OnPlayerConnected(Socket socket, Packet packet, object[] args) {
-        Debug.Log("OnPlayerConnected " + packet.Payload);
+        NetworkPlayerConnectedResponse receivedData = MessagePackSerializer.Deserialize<NetworkPlayerConnectedResponse>(packet.Attachments[0]);
+
+        onPlayerConnected?.Invoke(receivedData.id);
     }
 
     private void OnPlayerDisconnected(Socket socket, Packet packet, object[] args) {
-        Debug.Log("OnPlayerDisconnected" + packet.Payload);
+        NetworkDisconnectedPlayerResponse receivedData = MessagePackSerializer.Deserialize<NetworkDisconnectedPlayerResponse>(packet.Attachments[0]);
+
+        onPlayerDisconnected?.Invoke(receivedData.id);
     }
 
     private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {

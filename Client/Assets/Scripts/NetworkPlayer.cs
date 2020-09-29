@@ -7,6 +7,19 @@ public class NetworkPlayer : MonoBehaviour {
     private ulong _nextUpdate;
 
     private NetworkManager _networkManager = null;
+    public string SocketId { get; set; }
+
+    [Header("Debug")]
+    [SerializeField]
+    private bool _isMe = false;
+
+    public bool IsMe {
+        get { return _isMe; }
+        set { 
+            _isMe = value;
+            SetColor();
+        }
+    }
 
     private void Start() {
         _networkManager = NetworkManager.instance;
@@ -64,6 +77,14 @@ public class NetworkPlayer : MonoBehaviour {
 
         byte[] bytes = MessagePackSerializer.Serialize(networkInput);
         _networkManager.SocketManager.Socket.Emit("MOVE", bytes);
+    }
+
+    private void SetColor() {
+        if (IsMe) {
+            GetComponent<SpriteRenderer>().color = Color.red;
+        } else {
+            GetComponent<SpriteRenderer>().color = Color.blue;
+        }
     }
 
 }
