@@ -58,7 +58,7 @@ public class NetworkManager : MonoBehaviour {
     }
 
     private void OnAuthenticated(Socket socket, Packet packet, object[] args) {
-        NetworkWelcomeMessageResponse receivedData = MessagePackSerializer.Deserialize<NetworkWelcomeMessageResponse>(packet.Attachments[0]);
+        NetworkAuthenticateResponse receivedData = MessagePackSerializer.Deserialize<NetworkAuthenticateResponse>(packet.Attachments[0]);
         Debug.Log("OnWelcomeMessageReceived: " + receivedData.id);
 
         onConnected?.Invoke(receivedData.id);

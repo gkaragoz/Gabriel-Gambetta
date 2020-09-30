@@ -17,7 +17,7 @@ public class NetworkDisconnectedPlayerResponse {
     public string id { get; set; }
 }
 
-public class NetworkWelcomeMessageResponse {
+public class NetworkAuthenticateResponse {
     public string id { get; set; }
 }
 
