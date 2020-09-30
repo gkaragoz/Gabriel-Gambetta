@@ -1,4 +1,5 @@
 const { encode, decode } = require("@msgpack/msgpack");
+const events = require("./events");
 
 class Player {
   constructor(id, socket, position, speed) {
@@ -13,7 +14,7 @@ class Player {
   };
 
   handleMovement = () => {
-    this.socket.on("MOVE", (data) => {
+    this.socket.on(events.PLAYER_MOVE, (data) => {
       const decodedData = decode(data);
       const { additionX, additionY } = this.analyzeInput(decodedData);
 

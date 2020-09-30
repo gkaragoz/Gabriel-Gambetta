@@ -31,7 +31,7 @@ public class NetworkPlayer : MonoBehaviour {
     private void Awake() {
         _networkManager = NetworkManager.instance;
 
-        _networkManager.SocketManager.Socket.On("MOVE", OnBroadcastPositionsReceived);
+        _networkManager.SocketManager.Socket.On(NetworkEvents.PLAYER_MOVE, OnBroadcastPositionsReceived);
     }
 
     private void OnBroadcastPositionsReceived(Socket socket, Packet packet, object[] args) {
@@ -99,7 +99,7 @@ public class NetworkPlayer : MonoBehaviour {
         };
 
         byte[] bytes = MessagePackSerializer.Serialize(networkInput);
-        _networkManager.SocketManager.Socket.Emit("MOVE", bytes);
+        _networkManager.SocketManager.Socket.Emit(NetworkEvents.PLAYER_MOVE, bytes);
     }
 
     private void SetColor() {

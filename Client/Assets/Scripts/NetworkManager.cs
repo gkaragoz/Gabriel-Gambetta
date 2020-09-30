@@ -37,10 +37,10 @@ public class NetworkManager : MonoBehaviour {
         options.ConnectWith = BestHTTP.SocketIO.Transports.TransportTypes.WebSocket;
         _socketManager = new SocketManager(new Uri(URI + ":" + PORT + "/socket.io/"), options);
 
-        _socketManager.Socket.On("connecting", OnConnecting);
-        _socketManager.Socket.On("connect", OnConnected);
-        _socketManager.Socket.On("welcome_message", OnWelcomeMessageReceived);
-        _socketManager.Socket.On("disconnect", OnDisconnected);
+        _socketManager.Socket.On(NetworkEvents.CONNECTING, OnConnecting);
+        _socketManager.Socket.On(NetworkEvents.CONNECT, OnConnected);
+        _socketManager.Socket.On(NetworkEvents.AUTHENTICATE, OnAuthenticated);
+        _socketManager.Socket.On(NetworkEvents.DISCONNECT, OnDisconnected);
     }
 
     #region DEFAULT CONNECTIONS/DISCONNECTION
@@ -52,12 +52,12 @@ public class NetworkManager : MonoBehaviour {
     private void OnConnected(Socket socket, Packet packet, object[] args) {
         Debug.Log("OnConnect!");
 
-        _socketManager.Socket.On("INIT_PLAYERS", OnInitPlayersReceived);
-        _socketManager.Socket.On("PLAYER_CONNECTED", OnPlayerConnected);
-        _socketManager.Socket.On("PLAYER_DISCONNECTED", OnPlayerDisconnected);
+        _socketManager.Socket.On(NetworkEvents.INIT_PLAYERS, OnInitPlayersReceived);
+        _socketManager.Socket.On(NetworkEvents.PLAYER_CONNECTED, OnPlayerConnected);
+        _socketManager.Socket.On(NetworkEvents.PLAYER_DISCONNECTED, OnPlayerDisconnected);
     }
 
-    private void OnWelcomeMessageReceived(Socket socket, Packet packet, object[] args) {
+    private void OnAuthenticated(Socket socket, Packet packet, object[] args) {
         NetworkWelcomeMessageResponse receivedData = MessagePackSerializer.Deserialize<NetworkWelcomeMessageResponse>(packet.Attachments[0]);
         Debug.Log("OnWelcomeMessageReceived: " + receivedData.id);
 
@@ -67,10 +67,10 @@ public class NetworkManager : MonoBehaviour {
     private void OnDisconnected(Socket socket, Packet packet, object[] args) {
         Debug.Log("OnDisconnect");
 
-        _socketManager.Socket.Off("INIT_PLAYERS");
-        _socketManager.Socket.Off("PLAYER_CONNECTED");
-        _socketManager.Socket.Off("PLAYER_DISCONNECTED");
-        _socketManager.Socket.Off("MOVE");
+        _socketManager.Socket.Off(NetworkEvents.INIT_PLAYERS);
+        _socketManager.Socket.Off(NetworkEvents.PLAYER_CONNECTED);
+        _socketManager.Socket.Off(NetworkEvents.PLAYER_DISCONNECTED);
+        _socketManager.Socket.Off(NetworkEvents.PLAYER_MOVE);
 
         onDisconnected?.Invoke();
     }

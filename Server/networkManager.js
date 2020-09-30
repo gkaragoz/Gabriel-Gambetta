@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const events = require("./events");
 const Player = require("./player");
 
-const TICK_RATE = 20;
+const TICK_RATE = 2;
 
 let io;
 let players = [];
@@ -41,23 +41,28 @@ module.exports = {
 
       players.push(player);
 
-      const welcomeMessageResponse = { id: player.id };
+      const authenticationResponse = { id: player.id };
       socket
         .binary(true)
-        .emit("welcome_message", encode(welcomeMessageResponse));
+        .emit(events.AUTHENTICATE, encode(authenticationResponse));
 
       if (players.length > 1) {
-        const onlinePlayersResponse = {
+        const initPlayersResponse = {
           ids: players.map((p) => p.id).filter((id) => id !== player.id),
         };
 
-        socket.binary(true).emit("INIT_PLAYERS", encode(onlinePlayersResponse));
+        socket
+          .binary(true)
+          .emit(events.INIT_PLAYERS, encode(initPlayersResponse));
       }
 
       const playerConnectedResponse = { id: player.id };
       socket
         .binary(true)
-        .broadcast.emit("PLAYER_CONNECTED", encode(playerConnectedResponse));
+        .broadcast.emit(
+          events.PLAYER_CONNECTED,
+          encode(playerConnectedResponse)
+        );
 
       logOnlinePeopleCount();
     };
@@ -67,12 +72,14 @@ module.exports = {
         const disconnectedPlayer = getPlayerBySocketId(socket);
 
         if (disconnectedPlayer) {
-          console.log("PLAYER DISCONNECTED: " + disconnectedPlayer.id);
+          console.log(
+            `${events.PLAYER_DISCONNECTED}: ${disconnectedPlayer.id}`
+          );
 
-          const disconnectedPlayerId = { id: disconnectedPlayer.id };
+          const disconnectedPlayerResponse = { id: disconnectedPlayer.id };
           io.binary(true).emit(
-            "PLAYER_DISCONNECTED",
-            encode(disconnectedPlayerId)
+            events.PLAYER_DISCONNECTED,
+            encode(disconnectedPlayerResponse)
           );
 
           players = players.filter((p) => p.socket !== socket);
@@ -96,7 +103,7 @@ module.exports = {
         data.push(playerData);
       });
 
-      io.binary(true).emit("MOVE", encode(data));
+      io.binary(true).emit(events.PLAYER_MOVE, encode(data));
     }, 1000 / TICK_RATE);
   },
 };
