@@ -28,10 +28,6 @@
         // Entity interpolation toggle.
         public bool entity_interpolation = true;
 
-        // Update rate
-        // Default update rate.
-        public ulong update_rate = 50;
-
         public Date last_ts;
 
         // :: Additions
@@ -66,26 +62,8 @@
             //entity.x = Constants.SpawnPoints[entity_id];
         }
 
-        public void SetUpdateRate(ulong hz)
-        {
-            this.update_rate = hz;
-        }
-
-        // :: Addition
-        public void Tick()
-        {
-            var now = new Date();
-            if (now < _nextUpdate)
-            {
-                return;
-            }
-
-            _nextUpdate = now + this.update_rate;
-            Update();
-        }
-
         // Update Client state.
-        private void Update()
+        public void Update()
         {
             // Listen to the server.
             this.ProcessServerMessages();
@@ -286,13 +264,15 @@
                 // Interpolate between the two surrounding authoritative positions.
                 if (buffer.Count >= 2 && buffer[0].timestamp <= render_timestamp && render_timestamp <= buffer[1].timestamp) // :: Addition (instead of nested array, use struct to access named fields)
                 {
-                    var x0 = buffer[0].position.x;
-                    var x1 = buffer[1].position.x;
+                    var x0 = buffer[0].position;
+                    var x1 = buffer[1].position;
                     var t0 = buffer[0].timestamp;
                     var t1 = buffer[1].timestamp;
 
+                    Debug.Log("Çok mu");
+
                     //entity.position = Vector2.Lerp(x0, x1, (float)(render_timestamp - t0) / (t1 - t0));
-                    entity.position.x = (x0 + (x1 - x0) * (float)(render_timestamp - t0) / (t1 - t0));
+                    entity.position = (x0 + (x1 - x0) * (float)(render_timestamp - t0) / (t1 - t0));
                 }
             }
         }

@@ -86,7 +86,7 @@
                 return;
             }
 
-            _nextUpdate = now + Constants.ServerUpdateRate;
+            _nextUpdate = now + (1000 / Constants.ServerUpdateRate);
             Update();
         }
 

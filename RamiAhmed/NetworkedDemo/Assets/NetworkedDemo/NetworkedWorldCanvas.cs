@@ -24,9 +24,6 @@
 
         public int serverPort = 6700;
 
-        [Space]
-        public int update_rate = 50;
-
         public bool prediction;
 
         public bool reconciliation;
@@ -106,7 +103,6 @@
             _client.client_side_prediction = prediction;
             _client.server_reconciliation = reconciliation;
             _client.entity_interpolation = interpolation;
-            _client.SetUpdateRate((ulong)this.update_rate);
         }
 
         private void Update()
@@ -118,7 +114,7 @@
                 _client.key_up = UnityEngine.Input.GetKey(KeyCode.UpArrow) || UnityEngine.Input.GetKey(KeyCode.W);
                 _client.key_down = UnityEngine.Input.GetKey(KeyCode.DownArrow) || UnityEngine.Input.GetKey(KeyCode.S);
 
-                _client.Tick();
+                _client.Update();
             }
 
             if (_server != null)

@@ -7,7 +7,7 @@
         public const int MaxPlayers = 2;
         public const string HailSecret = "NetworkedDemoHail";
         public const string AppId = "NetworkedDemo";
-        public const int ServerUpdateRate = 10;
+        public const int ServerUpdateRate = 2;
 
         public const Lidgren.Network.NetDeliveryMethod DeliveryMethod = Lidgren.Network.NetDeliveryMethod.ReliableOrdered;
 

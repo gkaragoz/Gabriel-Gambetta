@@ -411,9 +411,8 @@ MonoBehaviour:
   - {fileID: 239499657}
   port: 3000
   drawGizmos: 1
-  serverIP: 127.0.0.1
+  serverIP: 25.48.94.142
   serverPort: 3000
-  update_rate: 50
   prediction: 0
   reconciliation: 0
   interpolation: 0
