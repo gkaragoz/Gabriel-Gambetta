@@ -269,8 +269,6 @@
                     var t0 = buffer[0].timestamp;
                     var t1 = buffer[1].timestamp;
 
-                    Debug.Log("Çok mu");
-
                     //entity.position = Vector2.Lerp(x0, x1, (float)(render_timestamp - t0) / (t1 - t0));
                     entity.position = (x0 + (x1 - x0) * (float)(render_timestamp - t0) / (t1 - t0));
                 }
