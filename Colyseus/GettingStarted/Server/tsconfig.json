@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "outDir": "lib",
-    "target": "es6",
-    "module": "commonjs",
-    "experimentalDecorators": true,
-    "esModuleInterop": true
-  }
-}
